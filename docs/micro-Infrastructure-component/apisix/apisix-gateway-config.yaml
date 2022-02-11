@@ -1,0 +1,98 @@
+apisix:
+  node_listen: 9080              # APISIX listening port
+  enable_ipv6: false
+
+  allow_admin:                  # http://nginx.org/en/docs/http/ngx_http_access_module.html#allow
+    - 0.0.0.0/0              # We need to restrict ip access rules for security. 0.0.0.0/0 is for test.
+  
+  admin_key:
+  - name: "admin"
+    key: edd1c9f034335f136f87ad84b625c8f1
+    role: admin                 # admin: manage all configuration data
+                                # viewer: only can view configuration data
+  - name: "viewer"
+    key: 4054f7cf07e344346cd3f287985e76a2
+    role: viewer
+  
+  enable_control: true
+  control:
+    ip: "0.0.0.0"
+    port: 9092
+
+
+
+etcd:
+  host:          # supports defining multiple etcd host addresses for an etcd cluster
+    - "http://192.168.31.170:2379"
+  user: "root"    # ignore etcd username if not enable etcd auth
+  password: "P@ssW0rd"  # ignore etcd password if not enable etcd auth
+
+discovery:
+  nacos:
+    host:
+      - "http://47.100.213.49:8848"
+    prefix: "/nacos/v1/"
+    fetch_interval: 30    # default 30 sec
+    weight: 100           # default 100
+    timeout:
+      connect: 2000       # default 2000 ms
+      send: 2000          # default 2000 ms
+      read: 5000          # default 5000 ms
+
+
+plugin_attr:
+  prometheus:
+    export_addr:
+      ip: "0.0.0.0"
+      port: 9091
+
+plugins:
+  - client-control
+  - ext-plugin-pre-req
+  - zipkin
+  - request-id
+  - fault-injection
+  - serverless-pre-function
+  - batch-requests
+  - cors
+  - ip-restriction
+  - ua-restriction
+  - referer-restriction
+  - uri-blocker
+  - request-validation
+  - openid-connect
+  - wolf-rbac
+  - hmac-auth
+  - basic-auth
+  - jwt-auth
+  - key-auth
+  - consumer-restriction
+  - authz-keycloak
+  - proxy-mirror
+  - proxy-cache
+  - proxy-rewrite
+  - api-breaker
+  - limit-conn
+  - limit-count
+  - limit-req
+  - gzip
+  - server-info
+  - traffic-split
+  - redirect
+  - response-rewrite
+  - grpc-transcode
+  - prometheus
+  - echo
+  - http-logger
+  - sls-logger
+  - tcp-logger
+  - kafka-logger
+  - syslog
+  - udp-logger
+  - serverless-post-function
+  - ext-plugin-post-req
+
+stream_plugins:
+  - ip-restriction
+  - limit-conn
+  - mqtt-proxy

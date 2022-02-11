@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sukt-apisix-gateway
+  namespace: sukt-platform
+spec:
+  selector:
+    matchLabels:
+      app: sukt-apisix-gateway
+  template:
+    metadata:
+      labels:
+        app: sukt-apisix-gateway
+    spec:
+      containers:
+      - name: sukt-apisix-gateway
+        image: apache/apisix:2.10.3-alpine
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        securityContext:
+          privileged: false
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /usr/local/apisix/conf/config.yaml
+          name: config
+          subPath: config.yaml
+        ports:
+        - containerPort: 9080
+        - containerPort: 9443
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: sukt-apisix-gateway-config
+          name: config

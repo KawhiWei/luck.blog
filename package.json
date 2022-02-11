@@ -1,0 +1,18 @@
+{
+  "name": "sukt.cloud.native.blog.vuepress",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:GeorGeWzw/sukt.cloud.native.blog.git",
+  "author": "wangzewei <1585955375@qq.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^1.9.7"
+  },
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "dependencies": {
+    "vuepress-theme-vdoing": "^1.9.4"
+  }
+}

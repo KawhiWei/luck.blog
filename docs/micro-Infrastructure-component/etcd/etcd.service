@@ -1,0 +1,14 @@
+
+[Unit]
+Description=ETCD Server
+Documentation=https://github.com/coreos/etcd
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=root
+Group=root
+ExecStart= etcd --config-file /home/etcd/etcd.conf.yml
+
+[Install]
+WantedBy=multi-user.target
