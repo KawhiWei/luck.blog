@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sukt-platform-blog
+  name: sukt-platform-blog
+  namespace: sukt-platform
+spec:
+  selector:
+    matchLabels:
+      app: sukt-platform-blog
+  template:
+    metadata:
+      labels:
+        app: sukt-platform-blog
+    spec:
+      nodeName: microk8sslave1 # 部署到指定的node节点
+      containers:
+        - name: sukt-platform-blog-website
+          image: registry.cn-hangzhou.aliyuncs.com/sukt-platform/sukt-cnblog-website:1.1.1
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "500m"
+          ports:
+          - containerPort: 80
+            protocol: TCP
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: aliyun-iamge-secret
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sukt-platform-blog
+  name: sukt-platform-blog
+  namespace: sukt-platform
+spec:
+  type: NodePort
+  selector:
+    app: sukt-platform-blog
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30110

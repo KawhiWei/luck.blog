@@ -1,3 +1,13 @@
+---
+title: 配置nacos
+date: 2022-02-10 21:46:44
+permalink: /pages/f3381d/
+categories:
+  - micro-Infrastructure-component
+  - nacos
+tags:
+  - 
+---
 # 不使用官方pvc的方式持久化Nacos部署到k8s
 ``` shell
 #建议将这种devops的所有基础组件放到一个namespance里面

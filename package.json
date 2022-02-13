@@ -6,13 +6,16 @@
   "author": "wangzewei <1585955375@qq.com>",
   "license": "MIT",
   "devDependencies": {
-    "vuepress": "^1.9.7"
+    "@vuepress/theme-blog": "^2.3.3",
+    "vuepress": "^1.9.7",
+    "vuepress-theme-onen": "^1.1.3-beta"
   },
   "scripts": {
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },
   "dependencies": {
-    "vuepress-theme-vdoing": "^1.9.4"
+    "vuepress-theme-vdoing": "^1.9.4",
+    "yamljs": "^0.3.0"
   }
 }

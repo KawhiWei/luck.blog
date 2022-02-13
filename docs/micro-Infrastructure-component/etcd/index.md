@@ -1,3 +1,13 @@
+---
+title: Ubuntu 安装etcd
+date: 2022-02-10 21:46:44
+permalink: /pages/d588a7/
+categories:
+  - micro-Infrastructure-component
+  - etcd
+tags:
+  - 
+---
 [apisix](../apisix/)
 + Ubuntu 安装etcd 
   ``` shell

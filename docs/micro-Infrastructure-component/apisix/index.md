@@ -1,3 +1,13 @@
+---
+title: K8S中部署apisix(非ingress)
+date: 2022-02-10 21:46:44
+permalink: /pages/e70f66/
+categories:
+  - micro-Infrastructure-component
+  - apisix
+tags:
+  - 
+---
 [Home](/)
 [etcd](../etcd/)
 # 不使用pvc的方式在K8S中部署apisix-gateway
