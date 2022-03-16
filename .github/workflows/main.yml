@@ -44,7 +44,7 @@ jobs:
         with:
           tags: ${{env.IMAGE_NAME}}:${{env.IMAGE_TAG}}.${{ github.run_number }} #动态变量镜像TAG 使用github运行job和jobid设置tag
           context: /home/runner/work/sukt.blog/sukt.blog
-          file: /home/runner/work/sukt.blog/sukt.blog/docs/.vuepress/dist/Dockerfile # 指定Dockerfile
+          file: /home/runner/work/sukt.blog/sukt.blog/docs/.vuepress/dist # 指定Dockerfile
           push: true
       - name: replace image tag
         uses: datamonsters/replace-action@v2
