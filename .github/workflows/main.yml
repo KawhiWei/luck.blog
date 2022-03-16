@@ -11,7 +11,7 @@ on:
     branches: [ main ]
 env:
   IMAGE_NAME: registry.cn-hangzhou.aliyuncs.com/sukt-platform/sukt-cnblog-website #
-  IMAGE_TAG: develop
+  IMAGE_TAG: production
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
