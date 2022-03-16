@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    k8s.kuboard.cn/displayName: skywalking-oap-server
+  labels:
+    k8s.kuboard.cn/layer: monitor
+    k8s.kuboard.cn/name: skywalking-oap-server
+  name: skywalking-oap-server
+  namespace: skywalking
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      k8s.kuboard.cn/layer: monitor
+      k8s.kuboard.cn/name: skywalking-oap-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        k8s.kuboard.cn/layer: monitor
+        k8s.kuboard.cn/name: skywalking-oap-server
+    spec:
+      containers:
+        - env:
+            - name: SW_SERVICE_NAME
+              value: skywalking-oap-server
+            - name: SW_CLUSTER
+              value: nacos
+            - name: SW_CLUSTER_NACOS_NAMESPACE
+              value: devops-prod
+            - name: SW_STORAGE
+              value: elasticsearch
+            - name: SW_STORAGE_ES_CLUSTER_NODES
+              value: >-
+                elasticsearch-0.es-svc.skywalking.svc.cluster.local:9200,elasticsearch-1.es-svc.skywalking.svc.cluster.local:9200,elasticsearch-2.es-svc.skywalking.svc.cluster.local:9200
+            - name: SW_CLUSTER_NACOS_HOST_PORT
+              value: 'nacos.nacos.svc:8848'
+            - name: TZ
+              value: Asia/Shanghai
+          image: 镜像地址
+          imagePullPolicy: IfNotPresent
+          name: skywalking-oap-server
+          ports:
+            - containerPort: 12800
+              protocol: TCP
+            - containerPort: 11800
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: volume-8tsbp
+              readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: File
+          name: volume-8tsbp
+status:
+  replicas: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    k8s.kuboard.cn/layer: monitor
+    k8s.kuboard.cn/name: skywalking-oap-server
+  name: skywalking-oap-server
+  namespace: skywalking
+spec:
+  clusterIP: xxx.xxx.xx.xx
+  ports:
+    - name: 3qdwq7
+      port: 12800
+      protocol: TCP
+      targetPort: 12800
+    - name: ra3af5
+      port: 11800
+      protocol: TCP
+      targetPort: 11800
+  selector:
+    k8s.kuboard.cn/layer: monitor
+    k8s.kuboard.cn/name: skywalking-oap-server
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

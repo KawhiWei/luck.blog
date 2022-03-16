@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skywalking-ui
+  namespace: sukt-platform
+spec:
+  selector:
+    matchLabels:
+      app: skywalking-ui
+  template:
+    metadata:
+      labels:
+        app: skywalking-ui
+    spec:
+      nodeName: microk8sslave1 # 部署到指定的node节点
+      containers:
+      - name: skywalking-ui
+        image: apache/skywalking-ui:8.9.1
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+          name: page
+        env:
+          - name: SW_OAP_ADDRESS #Skywalking服务端的地址，我这里是直接写了Skywalking服务的Service地址端口是resetful的
+            value: http://skywalking-service:12800
+          - name: TZ
+            value: Asia/Shanghai
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skywalking-ui
+  namespace: sukt-platform
+spec:
+  type: NodePort
+  selector:
+    app: skywalking-ui
+  ports:
+  - port: 8080
+    name: page
+    targetPort: 8080
+    nodePort: 30103

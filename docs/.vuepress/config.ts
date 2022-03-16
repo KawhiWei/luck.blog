@@ -29,7 +29,7 @@ export default defineConfig4CustomTheme<VdoingThemeConfig>({
     footer: {
       createYear: 2022, // 博客创建年份
       copyrightInfo:
-        '豫ICP备19040084号-2', // 博客版权信息，支持a标签或换行标签</br>
+        '<a href="https://beian.miit.gov.cn/" target="_blank">豫ICP备19040084号-2</a>', // 博客版权信息，支持a标签或换行标签</br>
     },
   }
 });

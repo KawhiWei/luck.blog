@@ -45,7 +45,10 @@ plugin_attr:
     export_addr:
       ip: "0.0.0.0"
       port: 9091
-
+  skywalking:
+    service_name: Sukt_APISIX_GateWay
+    service_instance_name: "$hostname"
+    endpoint_addr: http://skywalking-service:12800
 plugins:
   - client-control
   - ext-plugin-pre-req
@@ -91,7 +94,7 @@ plugins:
   - udp-logger
   - serverless-post-function
   - ext-plugin-post-req
-
+  - skywalking
 stream_plugins:
   - ip-restriction
   - limit-conn

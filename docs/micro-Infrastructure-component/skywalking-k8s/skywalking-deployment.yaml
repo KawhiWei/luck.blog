@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skywalking-service
+  namespace: sukt-platform
+spec:
+  selector:
+    matchLabels:
+      app: skywalking-service
+  template:
+    metadata:
+      labels:
+        app: skywalking-service
+    spec:
+      nodeName: microk8sslave1 # 部署到指定的node节点
+      containers:
+      - name: skywalking-service
+        image: apache/skywalking-oap-server:8.9.1
+        resources:
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
+        ports:
+        - containerPort: 11800
+          name: grpc
+        - containerPort: 12800
+          name: restful
+        env:
+          - name: JAVA_OPTS
+            value: "-Xmx2g -Xms2g"
+          - name: SW_CLUSTER
+            value: standalone #单节点部署如果是k8s集群的话换成(kubernetes),我这里使用单节点的方式
+          - name: SW_STORAGE #存储方式
+            value: elasticsearch
+          - name: SW_STORAGE_ES_CLUSTER_NODES # ES集群地址
+            value: 192.168.31.120:9200,192.168.31.121:9200,192.168.31.122:9200
+          - name: SW_NAMESPACE #Skywalking索引的名称
+            value: sukt-platform-skywalking-dev # 如果索引删除了，deployment的索引名字也要改，不然会直接启动不起来
+          - name: SW_ES_USER # ES用户
+            value: 
+          - name: SW_ES_PASSWORD # 密码
+            value: 
+          - name: TZ
+            value: Asia/Shanghai
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skywalking-service
+  namespace: sukt-platform
+spec:
+  type: NodePort
+  selector:
+    app: skywalking-service
+  ports:
+  - port: 11800
+    name: grpc
+    targetPort: 11800
+    nodePort: 30102
+  - port: 12800
+    name: restful
+    targetPort: 12800
+    nodePort: 30101
