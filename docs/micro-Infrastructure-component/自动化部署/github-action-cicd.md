@@ -1,3 +1,13 @@
+---
+title: github-action-cicd
+date: 2022-02-16 21:16:51
+permalink: /pages/221116/
+categories:
+  - micro-Infrastructure-component
+  - 自动化部署
+tags:
+  - 
+---
 # 两种github action 打包.Net Core 项目docker镜像推送到阿里云镜像仓库
   ## 1、GitHub Actions 是什么？
   大家知道，持续集成由很多操作组成，比如抓取代码、运行测试、登录远程服务器，发布到第三方服务等等。GitHub 把这些操作就称为 actions。
