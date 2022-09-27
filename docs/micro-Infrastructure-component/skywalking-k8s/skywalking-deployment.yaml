@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: skywalking-service
-  namespace: sukt-platform
+  namespace: luck-infrastructure
 spec:
   selector:
     matchLabels:
@@ -12,7 +12,7 @@ spec:
       labels:
         app: skywalking-service
     spec:
-      nodeName: microk8sslave1 # 部署到指定的node节点
+      #nodeName: microk8sslave1 # 部署到指定的node节点
       containers:
       - name: skywalking-service
         image: apache/skywalking-oap-server:8.9.1
@@ -33,7 +33,7 @@ spec:
           - name: SW_STORAGE #存储方式
             value: elasticsearch
           - name: SW_STORAGE_ES_CLUSTER_NODES # ES集群地址
-            value: 192.168.31.120:9200,192.168.31.121:9200,192.168.31.122:9200
+            value: 192.168.31.50:9200
           - name: SW_NAMESPACE #Skywalking索引的名称
             value: sukt-platform-skywalking-dev # 如果索引删除了，deployment的索引名字也要改，不然会直接启动不起来
           - name: SW_ES_USER # ES用户
@@ -48,7 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: skywalking-service
-  namespace: sukt-platform
+  namespace: luck-infrastructure
 spec:
   type: NodePort
   selector:
