@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    creator: admin
+  name: jenkins
+  namespace: luck-infrastructure
+spec:
+  selector:
+    matchLabels:
+      app: jenkins
+  progressDeadlineSeconds: 600
+  #replicas: 
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        app: jenkins
+      name: jenkins
+      namespace: luck-infrastructure
+    spec:
+      containers:
+        - image: registry.cn-hangzhou.aliyuncs.com/luck-walunt/luck-walunt-jenkins:2.361.3-lts-alpine-v3 #jenkins/jenkins:2.328
+          #imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
+          name: jenkins
+          volumeMounts:
+            - name: jenkins-volume
+              mountPath: /var/jenkins_home
+            - name: jenkins-localtime
+              mountPath: /etc/localtime
+          env:
+            - name: JAVA_OPTS
+              value: '-Xms256m -Xmx1024m -Duser.timezone=Asia/Shanghai -Dcasc.reload.token=$(POD_NAME) -Dorg.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator.websocketConnectionTimeout=300'
+            - name: TRY_UPGRADE_IF_NO_MARKER
+              value: 'true'
+          ports:
+            - name: http
+              containerPort: 8080
+            - name: agent
+              containerPort: 50000
+          resources:
+            requests:
+              cpu: 200m
+              memory: 500M
+            limits:
+              cpu: 800m
+              memory: 1.5Gi
+          securityContext:
+            privileged: false
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      serviceAccountName: jenkins-admin
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: jenkins-localtime
+          hostPath:
+            path: /etc/localtime
+        - name: jenkins-volume
+          persistentVolumeClaim:              #指定pvc
+            claimName: jenkins-pvc
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-service
+  namespace: luck-infrastructure
+spec:
+  type: NodePort
+  selector:
+    app: jenkins
+  ports:
+  - port: 8080
+    name: restful
+    targetPort: 8080
+    nodePort: 30104
+  - port: 50000
+    name: tcp
+    targetPort: 50000
+    nodePort: 30105
