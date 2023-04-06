@@ -1,4 +1,4 @@
-# Ubuntu 20.04 安装ClickHouse
+# Ubuntu 20.04 安装ClickHouse集群
   + ## 引言
     因为笔者最近一直想实现一个自己的APM服务端，但是看了很多APM服务端系统没有使用.Net Core来写的，都是采用Java或者Go，笔者是写C#的，但是笔者认为.Net Core的性能在现在对比Go和Java很有优势，所以笔者才有想法使用.Net Core来实现一个APM的服务端；最近在研究SkyWalking APM服务端的实现，在研究下来SkyWalking存储使用的是MySql、PgSql、ES用来存储数据，笔者本想使用MySql来进行存储但是看了很多文章都不推荐使用，原因是因为MySql吞吐量太低，对于大量数据提交并无法支撑，但是笔者不想是用ES，众所周知ES的配置相当麻烦而且也很吃内存，笔者配置了几次但是因为服务器是自己家里的机器，有时候会存在关机的情况，就会导致莫名其妙的无法启动ES，所以笔者在研究了一些其他类型的数据库，笔者经过对比MongDB、ClickHouse 最终选择了ClickHouse；在笔者看来放弃MongoDB的原因也是因为他的吞吐量太低，因为MongDB并不是适合APM数据存储，MongoDB本身是一个适用于存储非结构化数据和半结构化数据。ClickHouse是一种列式数据库，适用于存储和分析大量结构化数据，而且他的写入速度快，适合APM这种级别的写入效率。实现APM服务端的话那么它必然需要高性能的写入，所以笔者选择了ClickHouse。
   + ## ClickHouse简介
