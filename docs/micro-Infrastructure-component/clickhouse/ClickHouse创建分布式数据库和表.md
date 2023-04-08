@@ -1,5 +1,5 @@
 + # ClickHouse创建分布式数据库和表
-在上一篇文章讲了如何配置CLickHouse集群，但是遇到了一些问题，在创建分布式分布式数据库和表时需要使用Zookeeper所以就先结束了，本篇文章我们将讲解如何在K8S中运行Zookeeper集群和使用nfs网络存储进行持久化，然后再使用ClickHouse连接到Zookeeper集群创建分布式数据库和表。
+在上一篇文章讲了如何配置CLickHouse集群，但是遇到了一些问题，在创建分布式分布式数据库和表时需要使用Zookeeper所以就先结束了，本篇文章我们将讲解如何在K8S中运行Zookeeper集群和使用nfs网络存储进行持久化，然后再使用ClickHouse连接到Zookeeper集群创建分布式数据库和表。在 Kubernetes 中，我们可以通过 StorageClass 进行动态存储卷的管理和分配，而 NFS 是典型的动态存储之一。在创建 StorageClass 之前，确保已经有一个 NFS 服务器可用。
   + ## 1、安装nfs服务器
     安装完成后,NFS 服务将自动启动
     
@@ -53,8 +53,54 @@
     sudo mkdir -p  /data/nfs/zookeeper/clickhouse/node2
     sudo mkdir -p  /data/nfs/zookeeper/clickhouse/node3
     ```
-  + ## 在K8S中创建PV和PVC连接到nfs服务器
-    + 创建zookeeper-node1的pv-yaml文件
-    ``` yaml
+  + ## 在K8S中安装csi-driver-nfs使用此驱动连接nfs服务器
+    其中，provisioner 指定了使用 kubernetes.io/nfs 这个插件进行存储卷的分配，并通过 parameters 参数指定了 NFS 服务器的 IP 和挂载的路径。
+    ``` shell 
+    # 开启helm3
+    sudo microk8s enable helm3
+    # 添加csi-driver-nfs 包管理器仓库
+    sudo microk8s helm3 repo add csi-driver-nfs https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
 
+    # 更新helm3仓库地址
+    sudo microk8s helm3 repo update
+
+    # 在kube-system命名空间下安装csi-driver-nfs 
+    sudo microk8s helm3 install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
+    --namespace kube-system \
+    --set kubeletDir=/var/snap/microk8s/common/var/lib/kubelet
+
+    # 查看安装结果 一旦成功,就会输出类似如下图
+    sudo microk8s kubectl wait pod --selector app.kubernetes.io/name=csi-driver-nfs --for condition=ready --namespace kube-system
+    ```
+    todo 缺图片
+  + ## 在K8S中创建Storage Classes和Persistent Volume Claims使用nfs网络存储作为数据存储
+    创建一个zookeeper使用Storage Classes远程连接到nfs的数据存储可以看zookeeper-sc-nfs.yaml，建议一个相同的应用指定一个文件夹目录，并且创建Storage Classes；provisioner字段固定使用的是nfs.csi.k8s.io
+    ``` yaml
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: luck-zookeeper-nfs-csi # 替换你自己的
+    provisioner: nfs.csi.k8s.io
+    parameters:
+      server: 192.168.31.70
+      share: /data/nfs/zookeeper
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate  
+    
+    ```
+    创建一个zookeeper的pvc存储卷，storageClassName使用你自己创建StorageClass的名称
+    ``` yaml
+    apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: zookeeper-pvc
+      namespace: luck-infrastructure
+    spec:
+      storageClassName: luck-zookeeper-nfs-csi # 替换你自己的
+      resources:
+        requests:
+          storage: 10Gi
+      volumeMode: Filesystem
+      accessModes:
+        - ReadWriteOnce 
     ```
