@@ -3,27 +3,27 @@ kind: Deployment
 metadata:
   annotations:
     creator: admin
-  name: jenkins
+  name: jenkins-sc-pvc
   namespace: luck-infrastructure
 spec:
   selector:
     matchLabels:
-      app: jenkins
+      app: jenkins-sc-pvc
   progressDeadlineSeconds: 600
   #replicas: 
   revisionHistoryLimit: 2
   template:
     metadata:
       labels:
-        app: jenkins
-      name: jenkins
+        app: jenkins-sc-pvc
+      name: jenkins-sc-pvc
       namespace: luck-infrastructure
     spec:
       containers:
         - image: registry.cn-hangzhou.aliyuncs.com/luck-walunt/luck-walunt-jenkins:2.361.3-lts-alpine-v3 #jenkins/jenkins:2.328
           #imagePullPolicy: Always
-          imagePullPolicy: IfNotPresent
-          name: jenkins
+          imagePullPolicy: Always
+          name: jenkins-sc-pvc
           volumeMounts:
             - name: jenkins-volume
               mountPath: /var/jenkins_home
@@ -62,8 +62,7 @@ spec:
             path: /etc/localtime
         - name: jenkins-volume
           persistentVolumeClaim:              #指定pvc
-            claimName: jenkins-pvc
-
+            claimName: zookeeper-pvc
 
 ---
 apiVersion: v1
@@ -79,8 +78,8 @@ spec:
   - port: 8080
     name: restful
     targetPort: 8080
-    nodePort: 30104
+    nodePort: 30106
   - port: 50000
     name: tcp
     targetPort: 50000
-    nodePort: 30105
+    nodePort: 30107
