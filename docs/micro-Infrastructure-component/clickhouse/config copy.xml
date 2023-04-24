@@ -226,42 +226,60 @@
     <remote_servers>
         <!--集群名称《可自行修改》-->
         <luck_click_house_cluster>
-            <!-- shard定义分片的副本数量，这里只配置了三个 -->
+            <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
             <shard> 
                 <!--weight表示每个分片的写入权重值-->
                 <weight>1</weight> 
                 <!--internal_replication表示是否启用内部复制-->
                 <internal_replication>true</internal_replication>
-                <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可,但是在同一个shard标签内配置的replica不可以有相同的Ip，不然在创建数据库时会报错  -->
+                <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
                 <replica> 
                     <host>192.168.31.20</host>
                     <port>9000</port>
                     <user>default</user>
                     <password>wzw0126..</password>
                 </replica>
+                <replica>
+                    <host>192.168.31.20</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password>wzw0126..</password>
+                </replica>
             </shard>
-            <!-- shard定义分片的副本数量，这里只配置了三个 -->
+            <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
             <shard> 
                 <!--weight表示每个分片的写入权重值-->
                 <weight>1</weight> 
                 <!--internal_replication表示是否启用内部复制-->
                 <internal_replication>true</internal_replication>
-                <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可,但是在同一个shard标签内配置的replica不可以有相同的Ip，不然在创建数据库时会报错  -->
+                <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
                 <replica> 
                     <host>192.168.31.21</host>
                     <port>9000</port>
                     <user>default</user>
                     <password>wzw0126..</password>
                 </replica>
+                <replica>
+                    <host>192.168.31.21</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password>wzw0126..</password>
+                </replica>
             </shard>
-            <!-- shard定义分片的副本数量，这里只配置了三个 -->
+            <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
             <shard> 
                 <!--weight表示每个分片的写入权重值-->
                 <weight>1</weight> 
                 <!--internal_replication表示是否启用内部复制-->
                 <internal_replication>true</internal_replication>
-                <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可,但是在同一个shard标签内配置的replica不可以有相同的Ip，不然在创建数据库时会报错  -->
+                <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
                 <replica> 
+                    <host>192.168.31.22</host>
+                    <port>9000</port>
+                    <user>default</user>
+                    <password>wzw0126..</password>
+                </replica>
+                <replica>
                     <host>192.168.31.22</host>
                     <port>9000</port>
                     <user>default</user>
@@ -279,47 +297,34 @@
          See https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/replication/
       -->
 
-    
+    <!--
     <zookeeper>
         <node>
-            <host>192.168.31.11</host>
-            <port>30110</port>
+            <host>example1</host>
+            <port>2181</port>
         </node>
         <node>
-            <host>192.168.31.12</host>
-            <port>30110</port>
+            <host>example2</host>
+            <port>2181</port>
         </node>
         <node>
-            <host>192.168.31.13</host>
-            <port>30110</port>
+            <host>example3</host>
+            <port>2181</port>
         </node>
     </zookeeper>
-    
+    -->
 
     <!-- Substitutions for parameters of replicated tables.
           Optional. If you don't use replicated tables, you could omit that.
 
          See https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/replication/#creating-replicated-tables
       -->
-
-    <!-- ReplicatedMergeTree('/clickhouse/tables/{layer}-{shard}/hits', '{replica}') 
-        1. /clickhouse/tables/{layer}-{shard}/hits作为整体可以理解为表在zookeeper中的定位和识别符
-        2. 同一个{layer}-{shard}下面的表互为备份，会自动同步
-        3. layer我将之理解为集群识别符，虽然其可以与上面clickhouse_remote_servers配置中的cluster名称不一样；同一个配置文件是可以配置多个集群的，因此有layer这一说法
-        4. hits可以与表名相同，但是表名改变时这里不会变，因为这里的含义是，表在zookeeper中的定位和识别符
-        5. replica是备份序号的识别符，只要不同即可，可以设置为与该节点hostname相同（注意replica一定要不同）
-        6. macros中的值设置会对应到ReplicatedMergeTree中的变量（就是大括号的部分），这样在每个节点建立local表时，可以使用完全相同的SQL语句，因为变量由这里的配置控制呢
-        7. 
-    -->
-
+    <!--
     <macros>
-        <layer>luck_click_house_cluster</layer>
-        <!--每个节点的这个不同需要替换-->
-        <shard>shard01</shard> 
-        <!--填写你当前配置机器的Ip-->
-        <replica>192.168.31.20</replica>
+        <shard>01</shard>
+        <replica>example01-01-1</replica>
     </macros>
-
+    -->
 
 
     <!-- Reloading interval for embedded dictionaries, in seconds. Default: 3600. -->

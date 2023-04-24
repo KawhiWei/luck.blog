@@ -110,60 +110,48 @@
         <remote_servers>
           <!--集群名称《可自行修改》-->
           <luck_click_house_cluster>
-              <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
+              <!-- shard定义分片的副本数量，这里只配置了三个 -->
               <shard> 
                   <!--weight表示每个分片的写入权重值-->
                   <weight>1</weight> 
                   <!--internal_replication表示是否启用内部复制-->
                   <internal_replication>true</internal_replication>
-                  <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
+                  <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可,但是IP不可以相同，不然在创建数据库时会报错  -->
                   <replica> 
                       <host>192.168.31.20</host>
                       <port>9000</port>
                       <user>default</user>
                       <password>wzw0126..</password>
                   </replica>
-                  <replica>
-                      <host>192.168.31.20</host>
-                      <port>9000</port>
-                      <user>default</user>
-                      <password>wzw0126..</password>
-                  </replica>
-              </shard>
-              <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
-              <shard> 
-                  <!--weight表示每个分片的写入权重值-->
-                  <weight>1</weight> 
-                  <!--internal_replication表示是否启用内部复制-->
-                  <internal_replication>true</internal_replication>
-                  <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
                   <replica> 
                       <host>192.168.31.21</host>
                       <port>9000</port>
                       <user>default</user>
                       <password>wzw0126..</password>
                   </replica>
-                  <replica>
+              </shard>
+              <!-- shard定义分片的副本数量，这里只配置了三个   -->
+              <shard> 
+                  <!--weight表示每个分片的写入权重值-->
+                  <weight>1</weight> 
+                  <!--internal_replication表示是否启用内部复制-->
+                  <internal_replication>true</internal_replication>
+                  <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可,但是IP不可以相同，不然在创建数据库时会报错  -->
+                  <replica> 
                       <host>192.168.31.21</host>
                       <port>9000</port>
                       <user>default</user>
                       <password>wzw0126..</password>
                   </replica>
               </shard>
-              <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
+              <!-- shard定义分片的副本数量，这里只配置了三个   -->
               <shard> 
                   <!--weight表示每个分片的写入权重值-->
                   <weight>1</weight> 
                   <!--internal_replication表示是否启用内部复制-->
                   <internal_replication>true</internal_replication>
-                  <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可  -->
+                  <!-- replica定义分片的副本数量，这里只配置了一个，如果需要配置多个，追加replica即可,但是IP不可以相同，不然在创建数据库时会报错  -->
                   <replica> 
-                      <host>192.168.31.22</host>
-                      <port>9000</port>
-                      <user>default</user>
-                      <password>wzw0126..</password>
-                  </replica>
-                  <replica>
                       <host>192.168.31.22</host>
                       <port>9000</port>
                       <user>default</user>
@@ -172,14 +160,15 @@
               </shard>
           </luck_click_house_cluster>
         </remote_servers>
-      ```
-      集群配置添加完成后确认集群在任意一台机器上执行下面的命令登录数据库，确认集群配置，我是使用的3拖6的集群配置；
-      ![](https://wangzewei.oss-cn-beijing.aliyuncs.com/images/20230405170413.png)
-      ``` shell
-        # 登录clickhouse服务端
-        clickhouse-client -u 你的用户名
-        # 查询集群命令
-        select * from system.clusters;
-      ```
+    + ### 4.3、ClickHouse配置macros策略
+      使用ReplicatedMergeTree创建表需要配置macros策略。它可以用于指定数据复制和分区策略。当为ReplicatedMergeTree表创建macros时，必须首先将存储引擎指定为ReplicatedMergeTree。
+    集群配置添加完成后确认集群在任意一台机器上执行下面的命令登录数据库，确认集群配置，我是使用的3拖6的集群配置；
+    ![](https://wangzewei.oss-cn-beijing.aliyuncs.com/images/20230412142538.png)
+    ``` shell
+      # 登录clickhouse服务端
+      clickhouse-client -u 你的用户名
+      # 查询集群命令
+      select * from system.clusters;
+    ```
   + ### 5.3、结语
     在配置ClickHouse时遇到了很多问题，例如不知道集群如何设置，所以花费了将近一天的时间，但是如果你们公司有专门的DBA这件事情完全不用你操心，或者可以选择云服务商的ClickHouse，笔者纯粹是想学习以下ClickHouse的集群配置，所以会花费一些时间来进行研究，但是重点仍然是APM服务端的实现。在看过SkyWalking的表设计之后，笔者是被震惊到了，他有287张表，甚是惊讶。毕竟SkyWalking已经是一个成熟的APM项目，所以还是有很多值得学习的。本篇只讲了如何配置ClickHouse集群，但是笔者在创建分布式数据库和表时发现ClickHouse想使用分布式的数据库或者表还需要Zookeeper,所以ClickHouse会出至少两篇文章，下一篇将记录ClickHouse如何使用Zookeeper集群来建立分布式数据库或者表。ClickHouse系列是APM系统的打头。
