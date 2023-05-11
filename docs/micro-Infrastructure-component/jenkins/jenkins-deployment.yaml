@@ -10,7 +10,7 @@ spec:
     matchLabels:
       app: jenkins
   progressDeadlineSeconds: 600
-  #replicas: 
+  replicas: 1
   revisionHistoryLimit: 2
   template:
     metadata:
@@ -20,9 +20,9 @@ spec:
       namespace: luck-infrastructure
     spec:
       containers:
-        - image: registry.cn-hangzhou.aliyuncs.com/luck-walunt/luck-walunt-jenkins:2.361.3-lts-alpine-v3 #jenkins/jenkins:2.328
+        - image: registry.cn-hangzhou.aliyuncs.com/luck-walunt/jenkins:2.361.3-lts-alpine-v3
           #imagePullPolicy: Always
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           name: jenkins
           volumeMounts:
             - name: jenkins-volume
@@ -61,7 +61,7 @@ spec:
           hostPath:
             path: /etc/localtime
         - name: jenkins-volume
-          persistentVolumeClaim:              #指定pvc
+          persistentVolumeClaim: 
             claimName: jenkins-sc-pvc
 
 ---
