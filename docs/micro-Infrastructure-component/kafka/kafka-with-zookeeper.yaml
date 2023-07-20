@@ -22,17 +22,29 @@ spec:
                   - key: "app"
                     operator: In
                     values:
-                    - kafka-with-zookeeper
+                    - kafka
               topologyKey: "kubernetes.io/hostname"
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+             - weight: 1
+               podAffinityTerm:
+                 labelSelector:
+                    matchExpressions:
+                      - key: "app"
+                        operator: In
+                        values:
+                        - zookeeper
+                 topologyKey: "kubernetes.io/hostname"
+      terminationGracePeriodSeconds: 300
       containers:
       - name: kafka
-        image: bitnami/kafka:3.5.0
+        image: registry.cn-hangzhou.aliyuncs.com/jaxzhai/k8skafka:v1
         command:
         - sh
         - -c
         - "exec kafka-server-start.sh /opt/kafka/config/server.properties --override broker.id=${HOSTNAME##*-} \
           --override listeners=PLAINTEXT://:9092 \
-          --override zookeeper.connect=zk-0.zk-hs.tools.svc.cluster.local:2181,zk-1.zk-hs.tools.svc.cluster.local:2181,zk-2.zk-hs.tools.svc.cluster.local:2181 \
+          --override zookeeper.connect=zookeeper-0.zookeeper-hs.luck-infrastructure.svc.cluster.local:2181,zookeeper-1.zookeeper-hs.luck-infrastructure.svc.cluster.local:2181,zookeeper-2.zookeeper-hs.luck-infrastructure.svc.cluster.local:2181 \
           --override log.dir=/var/lib/kafka \
           --override auto.create.topics.enable=true \
           --override auto.leader.rebalance.enable=true \
@@ -118,28 +130,16 @@ spec:
           --override replica.fetch.response.max.bytes=10485760 \
           --override reserved.broker.max.id=1000 "
         env:
-        - name: KAFKA_BROKER_ID
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: KAFKA_CFG_ZOOKEEPER_CONNECT
-          value: zookeeper-cs:2181
-        - name: ALLOW_PLAINTEXT_LISTENER
-          value: "yes"
-        - name: KAFKA_ADVERTISED_LISTENERS
-          value: PLAINTEXT://$(MY_POD_NAME).kafka-headless.kafka.svc.cluster.local:9092
-        - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
-          value: "3"
-        - name: KAFKA_KRAFT_CLUSTER_ID
-          value: "luck-infrastructure-kafka"
-        - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
-          value: "true"
+        - name: KAFKA_OPTS
+          value: "-Xmx1G -Xms1G"
+        - name: KAFKA_OPTS
+          value: "-Dlogging.level=INFO"
         ports:
         - containerPort: 9092
           name: kafka
         volumeMounts:
         - name: kafka-volume
-          mountPath: /bitnami/kafka/data
+          mountPath: /var/lib/kafka
   volumeClaimTemplates:
     - metadata:
         name: kafka-volume

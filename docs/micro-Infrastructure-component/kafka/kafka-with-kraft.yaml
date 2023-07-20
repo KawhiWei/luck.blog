@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: luck-infrastructure
+  name: kafka-kraft
+spec:
+  selector:
+    matchLabels:
+      app: kafka-kraft
+  serviceName: kafka-kraft-svc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-kraft
+    spec:
+      containers:
+      - name: kafka-kraft
+        image: bitnami/kafka:3.5.0
+        env:
+        - name: KAFKA_ENABLE_KRAFT # 允许使用kraft，即Kafka替代Zookeeper
+          value: "yes"
+        - name: KAFKA_CFG_PROCESS_ROLES # kafka角色，做broker，也要做controller
+          value: "broker,controller"
+        - name: KAFKA_CFG_CONTROLLER_LISTENER_NAMES # 指定供外部使用的控制类请求信息
+          value: "CONTROLLER"
+        - name: KAFKA_CFG_LISTENERS
+          value: "PLAINTEXT://:9092,CONTROLLER://:9093" # 定义kafka服务端socket监听端口
+        - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP # 定义安全协议
+          value: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+        - name: KAFKA_KRAFT_CLUSTER_ID # 使用Kafka时的集群id，集群内的Kafka都要用这个id做初始化，生成一个UUID即可
+          value: "LelM2dIFQkiUFvXCEcqRWA"
+        - name: KAFKA_CFG_CONTROLLER_QUORUM_VOTERS # 集群地址
+          value: "1@kafka-headless:9093"
+        - name: ALLOW_PLAINTEXT_LISTENER # 允许使用PLAINTEXT监听器，默认false，不建议在生产环境使用
+          value: "yes"
+        - name: KAFKA_HEAP_OPTS # 设置broker最大内存，和初始内存
+          value: "-Xmx512M -Xms256M"
+        - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE # 不允许自动创建主题
+          value: "true"
+        - name: KAFKA_CFG_ADVERTISED_LISTENERS # 定义外网访问地址（宿主机ip地址和端口）
+          value: "PLAINTEXT://kafka-headless:9092"
+        - name: KAFKA_BROKER_ID  # broker.id，必须唯一
+          value: "1" 
+        - name: KAFKA_CFG_NODE_ID # 
+          value: "1"
+        ports:
+        - containerPort: 9092
+          name: kafka
+        - containerPort: 9093
+          name: kafka-version
+        volumeMounts:
+        - name: kafka-volume
+          mountPath: /var/lib/kafka
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: luck-kafka-nfs-csi
+        resources:
+          requests:
+            storage: 10Gi
+  updateStrategy:
+    type: RollingUpdate
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: luck-infrastructure
+  name: kafka-headless
+spec:
+  clusterIP: None
+  selector:
+    app: kafka-kraft-svc
+  ports:
+    - port: 9092
+      targetPort: 30111
+      name: kafka
+    - port: 9093
+      targetPort: 30112
+      name: kafka-version
