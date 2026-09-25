@@ -20,7 +20,7 @@ spec:
       namespace: luck-infrastructure
     spec:
       containers:
-        - image: registry.cn-hangzhou.aliyuncs.com/luck-walunt/jenkins:2.361.3-lts-alpine-v3
+        - image: registry.cn-hangzhou.aliyuncs.com/toyar/jenkins:2.361.3-lts-alpine-v3
           #imagePullPolicy: Always
           imagePullPolicy: IfNotPresent
           name: jenkins

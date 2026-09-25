@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: luck-kafka-nfs-csi
+provisioner: nfs.csi.k8s.io  # 替换为你的存储提供器 如: kubernetes.io/gce-pd、nfs.csi.k8s.io 或 kubernetes.io/aws-ebs 等
+parameters:
+  server: 192.168.31.70
+  share: /data/nfs/kafka
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
